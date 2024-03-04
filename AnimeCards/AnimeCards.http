@@ -1,0 +1,6 @@
+@AnimeCards_HostAddress = http://localhost:5271
+
+GET {{AnimeCards_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
