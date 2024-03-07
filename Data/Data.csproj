@@ -20,4 +20,8 @@
     <ProjectReference Include="..\Entity\Entity.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Extension\" />
+  </ItemGroup>
+
 </Project>

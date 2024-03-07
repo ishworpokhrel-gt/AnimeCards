@@ -1,5 +1,6 @@
 ﻿using Entity;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace Data
 {
@@ -9,6 +10,8 @@ namespace Data
         {
 
         }
+
+
         public DbSet<Anime> Animes { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
