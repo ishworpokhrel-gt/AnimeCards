@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20240304085317_addanimetableandseeddata")]
-    partial class addanimetableandseeddata
+    [Migration("20240307105125_added_animetable_database")]
+    partial class added_animetable_database
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -27,9 +27,8 @@ namespace Data.Migrations
 
             modelBuilder.Entity("Entity.Anime", b =>
                 {
-                    b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                    b.Property<string>("Id")
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("datetimeoffset");
@@ -61,7 +60,7 @@ namespace Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("5a9e1b80-eb09-4ed9-a9c4-0f9b4201f33e"),
+                            Id = "3266b244-0525-4ed3-a798-8c6fa2f5c7cb",
                             CreatedOn = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             IsDeleted = false,
                             Language = "JPN",
@@ -71,7 +70,7 @@ namespace Data.Migrations
                         },
                         new
                         {
-                            Id = new Guid("af50caa8-dc9d-4b95-8311-09d2e1e6ecaf"),
+                            Id = "c634fdaa-8537-4045-88c9-f24c908adc83",
                             CreatedOn = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             IsDeleted = false,
                             Language = "KOR",
@@ -81,7 +80,7 @@ namespace Data.Migrations
                         },
                         new
                         {
-                            Id = new Guid("b3cda9e2-9091-4143-8e77-a083f6cf4408"),
+                            Id = "0b338819-a1ff-4cfe-b723-bf330763f987",
                             CreatedOn = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             IsDeleted = false,
                             Language = "NPL",

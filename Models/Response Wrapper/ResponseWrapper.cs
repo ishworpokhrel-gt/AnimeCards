@@ -1,10 +1,10 @@
 ﻿namespace Models.Response_Wrapper
 {
 
-    public class SuccessResponseWrapper
+    public class SuccessResponseWrapper<T>
     {
         public const string _Version = "1.1";
-        public SuccessResponseWrapper(object data)
+        public SuccessResponseWrapper(T data)
         {
             Data = data;
         }
@@ -21,12 +21,12 @@
 
 
         };
-        public object Data { get; set; }
+        public T Data { get; set; }
 
 
-        public static SuccessResponseWrapper SuccessApi(object data)
+        public static SuccessResponseWrapper<T> SuccessApi(T data)
         {
-            return new SuccessResponseWrapper(data);
+            return new SuccessResponseWrapper<T>(data);
         }
 
     }
