@@ -1,5 +1,5 @@
-﻿using Models.Anime;
-using Models.ResponseModel;
+﻿using Common_Shared.ResponseResult;
+using Models.Anime;
 
 namespace Business.Anime
 {

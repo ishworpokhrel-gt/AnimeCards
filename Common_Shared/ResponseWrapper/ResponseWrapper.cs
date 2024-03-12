@@ -1,4 +1,4 @@
-﻿namespace Models.Response_Wrapper
+﻿namespace Common_Shared.ResponseWrapper
 {
 
     public class SuccessResponseWrapper<T>

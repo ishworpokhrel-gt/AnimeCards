@@ -1,9 +1,13 @@
-﻿namespace Models.ResponseModel
+﻿namespace Common_Shared.ResponseResult
 {
+
     public class ResponseResult
     {
-        public object? Result { get; set; }
-        public string? Message { get; set; } = "Executed Successfully";
+
+
+
+        public object Result { get; set; }
+        public string Message { get; set; } = "Executed Successfully";
         public StatusDetails Status { get; set; }
         public bool IsSuccess => Status == StatusDetails.Success;
 
@@ -46,6 +50,6 @@
     };
 
 
-
-
 }
+
+

@@ -1,7 +1,7 @@
 ﻿using Business.Anime;
+using Common_Shared.ResponseWrapper;
 using Microsoft.AspNetCore.Mvc;
 using Models.Anime;
-using Models.Response_Wrapper;
 
 namespace AnimeCards.Controllers
 {

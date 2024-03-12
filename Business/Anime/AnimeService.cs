@@ -1,7 +1,7 @@
-﻿using Data;
+﻿using Common_Shared.ResponseResult;
+using Data;
 using Microsoft.EntityFrameworkCore;
 using Models.Anime;
-using Models.ResponseModel;
 
 namespace Business.Anime
 {

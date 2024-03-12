@@ -1,0 +1,27 @@
+﻿using Business.Business.cms.Account;
+using Common_Shared.ResponseWrapper;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Models.Account;
+
+namespace AnimeCards.Controllers
+{
+
+    public class AccountController : BaseApiController
+    {
+        private readonly IAccountService _accountService;
+        public AccountController(IAccountService accountService)
+        {
+            _accountService = accountService;
+        }
+
+        [HttpPost("LogIn")]
+        public async Task<IActionResult> LogIn(LogInRequestModel model)
+        {
+            var result = await _accountService.LogInAsync(model);
+            if (result.IsSuccess)
+                return Ok(SuccessResponseWrapper<object>.SuccessApi(result.Result));
+            return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
+        }
+    }
+}
