@@ -1,5 +1,8 @@
 ﻿
+using Microsoft.AspNetCore.Http;
+using System;
 using System.Net;
+using System.Threading.Tasks;
 
 namespace AnimeCards.MiddleWare
 {
@@ -8,7 +11,7 @@ namespace AnimeCards.MiddleWare
         private readonly RequestDelegate _next;
         public ExceptionMiddleware(RequestDelegate next)
         {
-            _next = next; 
+            _next = next;
         }
         public async Task InvokeAsync(HttpContext context)
         {

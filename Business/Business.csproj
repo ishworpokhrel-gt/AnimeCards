@@ -10,12 +10,15 @@
 		<ProjectReference Include="..\Common_Shared\Common_Shared.csproj" />
 		<ProjectReference Include="..\Models\Models.csproj" />
 		<ProjectReference Include="..\Data\Data.csproj" />
-		
 	</ItemGroup>
 
 	<ItemGroup>
 	  <Folder Include="Business.Agent\" />
 	  <Folder Include="Business.Customer\" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <PackageReference Include="Microsoft.AspNetCore.Identity" Version="2.2.0" />
 	</ItemGroup>
 
 </Project>

@@ -6,14 +6,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\Common_Shared\Common_Shared.csproj" />
-		<PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
+	  <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0-preview.2.24128.5" />
 	</ItemGroup>
 
-	<!--<ItemGroup>
-    -->
-	<!--<ProjectReference Include="..\Common_Shared\Common_Shared.csproj" />-->
-	<!--
-  </ItemGroup>-->
-
+	<ItemGroup>
+		<ProjectReference Include="..\Common_Shared\Common_Shared.csproj" />
+	</ItemGroup>
 </Project>

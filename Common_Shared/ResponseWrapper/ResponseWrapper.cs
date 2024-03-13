@@ -46,23 +46,24 @@
         };
 
         public List<ErrorDetails> Errors { get; set; }
-        public ErrorResponseWrapper(string message)
+        public ErrorResponseWrapper(string message , int code)
         {
             Errors = new List<ErrorDetails>()
             {
                 new ErrorDetails
                 {
-                    Code = 400,
+                    Code = code,
                     Message = message
 
                 }
             };
         }
 
-        public static ErrorResponseWrapper ErrorApi(string message)
+        public static ErrorResponseWrapper ErrorApi(string message , int code = 400)
         {
-            return new ErrorResponseWrapper(message);
+            return new ErrorResponseWrapper(message,code);
         }
+    
     }
 
 

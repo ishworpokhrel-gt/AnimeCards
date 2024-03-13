@@ -1,7 +1,7 @@
-﻿using Common_Shared.Attributes;
+﻿using Common_Shared.Attribute;
 using System.ComponentModel.DataAnnotations;
 
-namespace Models.Account
+namespace Animals.Account
 {
     public class LogInRequestModel
     {

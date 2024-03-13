@@ -1,8 +1,10 @@
-﻿using Business.Business.cms.Account;
+﻿using Animals.Account;
+using AnimeCards.Filters.AuthorizationFilters;
+using Business.Business.cms.Account;
+using Common_Shared.Constants;
 using Common_Shared.ResponseWrapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Models.Account;
+using System.Threading.Tasks;
 
 namespace AnimeCards.Controllers
 {
@@ -16,6 +18,7 @@ namespace AnimeCards.Controllers
         }
 
         [HttpPost("LogIn")]
+        [Permission(PermissionConstants.Create)]
         public async Task<IActionResult> LogIn(LogInRequestModel model)
         {
             var result = await _accountService.LogInAsync(model);

@@ -1,29 +1,30 @@
 ﻿using Common_Shared.SystemList;
+using Entity;
 using Microsoft.AspNetCore.Identity;
 
 namespace Data.Seed
 {
     public static class SeedRoles
     {
-        public static async Task RoleSeeder(RoleManager<IdentityRole> roleManager)
+        public static async Task RoleSeeder(RoleManager<ApplicationRole> roleManager)
         {
-            var listOfRoles = new List<IdentityRole>
+            var listOfRoles = new List<ApplicationRole>
             {
-                new IdentityRole
+                new ApplicationRole
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = SystemConstant.AdminRole,
                     NormalizedName = SystemConstant.AdminRole
                 },
 
-                 new IdentityRole
+                 new ApplicationRole
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = SystemConstant.AgentRole,
                     NormalizedName = SystemConstant.AgentRole
                 },
 
-                  new IdentityRole
+                  new ApplicationRole
                 {
                     Id = Guid.NewGuid().ToString(),
                     Name = SystemConstant.CustomerRole,

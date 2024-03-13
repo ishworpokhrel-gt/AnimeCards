@@ -42,7 +42,6 @@ namespace Common_Shared.Token
 
             return new(tokenHandler.WriteToken(token), time * 60);
 
-
         }
 
     }

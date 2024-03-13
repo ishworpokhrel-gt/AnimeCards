@@ -1,7 +1,7 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 
-namespace Common_Shared.Attributes
+namespace Common_Shared.Attribute
 {
     public class UserNameAttribute : ValidationAttribute
     {

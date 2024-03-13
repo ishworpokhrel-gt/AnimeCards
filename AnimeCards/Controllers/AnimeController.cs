@@ -2,6 +2,7 @@
 using Common_Shared.ResponseWrapper;
 using Microsoft.AspNetCore.Mvc;
 using Models.Anime;
+using System.Threading.Tasks;
 
 namespace AnimeCards.Controllers
 {
