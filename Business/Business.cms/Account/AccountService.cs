@@ -1,11 +1,13 @@
-﻿using Animals.Account;
-using Common_Shared.Accessor;
+﻿using Common_Shared.Accessor;
 using Common_Shared.CommonModel;
 using Common_Shared.ResponseResult;
 using Common_Shared.Token;
 using Data;
 using Entity;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
+using Models.Account;
+using System.Text.RegularExpressions;
 
 namespace Business.Business.cms.Account
 {
@@ -31,6 +33,7 @@ namespace Business.Business.cms.Account
             _userAccessor = userAccessor;
             _signInManager = signInManager;
         }
+
         public async Task<ResponseResult> LogInAsync(LogInRequestModel model)
         {
             var user = await _userManager.FindByNameAsync(model.UserName);
@@ -75,6 +78,52 @@ namespace Business.Business.cms.Account
 
             return ResponseResult.Success("Login Successfully");
 
+        }
+
+        public async Task<ResponseResult> ChangePasswordAsync(ChangePasswordRequestModel passwordModel)
+        {
+            var personLoggedIn = _userAccessor.GetUserId();
+
+            var user = await _dbContext.Users
+                                       .Where(a => a.Id == personLoggedIn)
+                                       .FirstOrDefaultAsync();
+            if (user == null)
+            {
+                return ResponseResult.Failed("User not found.");
+            }
+            bool validUser = await _userManager.CheckPasswordAsync(user, passwordModel.OldPassword);
+            if (!validUser)
+            {
+                return ResponseResult.Failed("Incorrect old password.");
+            }
+            var validPassword = PasswordValidator(passwordModel.NewPassword);
+
+            if (!validPassword)
+            {
+                return ResponseResult.Failed("Please provide strong password with letters and special characters.");
+            }
+            var hashpassword = _userManager.PasswordHasher.HashPassword(user, passwordModel.NewPassword);
+
+            var changePassword = await _userManager.ChangePasswordAsync(user, passwordModel.OldPassword, passwordModel.NewPassword);
+            if (!changePassword.Succeeded)
+            {
+                return ResponseResult.Failed(changePassword.Errors.Select(a => a.Description).FirstOrDefault());
+            }
+            return ResponseResult.Success("password changed successfully.");
+        }
+
+        public static bool PasswordValidator(string password)
+        {
+            if (password == null)
+            {
+                return false;
+            }
+            var isValid = Regex.IsMatch(password, @"[^(a-zA-Z0-9)]");
+            if (isValid)
+            {
+                return true;
+            }
+            return false;
         }
 
 

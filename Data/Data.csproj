@@ -17,6 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Common_Shared\Common_Shared.csproj" />
 		<ProjectReference Include="..\Entity\Entity.csproj" />
 		<ProjectReference Include="..\Models\Models.csproj" />
 	</ItemGroup>

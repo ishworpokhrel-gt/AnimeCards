@@ -9,7 +9,7 @@
 	  <PackageReference Include="Microsoft.Extensions.Options" Version="9.0.0-preview.2.24128.5" />
 	</ItemGroup>
 
-	<ItemGroup>
+	<!--<ItemGroup>
 		<ProjectReference Include="..\Common_Shared\Common_Shared.csproj" />
-	</ItemGroup>
+	</ItemGroup>-->
 </Project>

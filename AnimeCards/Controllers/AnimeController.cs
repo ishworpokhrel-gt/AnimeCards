@@ -1,5 +1,8 @@
-﻿using Business.Anime;
+﻿using AnimeCards.Filters.AuthorizationFilters;
+using Business.Anime;
+using Common_Shared.Constants;
 using Common_Shared.ResponseWrapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Anime;
 using System.Threading.Tasks;
@@ -14,6 +17,7 @@ namespace AnimeCards.Controllers
             _animeService = animeService;
         }
         [HttpGet("GetAllAnimes")]
+        [Permission(PermissionConstants.Read)]
         public async Task<IActionResult> GetAll()
         {
             var responseData = await _animeService.GetAllAsync();
@@ -26,6 +30,7 @@ namespace AnimeCards.Controllers
         }
 
         [HttpPost("GetAnimeById")]
+        [Permission(PermissionConstants.Read)]
         public async Task<IActionResult> GetAnimeById(string Id)
         {
             var responseData = await _animeService.GetAllByIdAsync(Id);
@@ -38,6 +43,7 @@ namespace AnimeCards.Controllers
         }
 
         [HttpPut("UpdateAnime")]
+        //[Permission(PermissionConstants.Update)]
         public async Task<IActionResult> UpdateAnime(string Id, UpdateAnimeRequestModel model)
         {
             var responseData = await _animeService.UpdateAsync(Id, model);
@@ -50,6 +56,7 @@ namespace AnimeCards.Controllers
         }
 
         [HttpDelete("DeleteAnime")]
+        //[Permission(PermissionConstants.Delete)]
         public async Task<IActionResult> DeleteAnime(string Id)
         {
             var responseData = await _animeService.DeleteAsync(Id);

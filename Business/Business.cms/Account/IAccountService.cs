@@ -1,5 +1,5 @@
-﻿using Animals.Account;
-using Common_Shared.ResponseResult;
+﻿using Common_Shared.ResponseResult;
+using Models.Account;
 
 namespace Business.Business.cms.Account
 {
@@ -7,6 +7,7 @@ namespace Business.Business.cms.Account
     {
         //Task<ResponseResult> RegisterAsync(LogInRequestModel model);
         Task<ResponseResult> LogInAsync(LogInRequestModel model);
+        Task<ResponseResult> ChangePasswordAsync(ChangePasswordRequestModel passwordModel);
         //Task<ResponseResult> LogOutAsync();
     }
 }

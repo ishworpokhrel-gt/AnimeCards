@@ -19,7 +19,7 @@ namespace AnimeCards.Filters.AuthorizationFilters
         }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var userId = context.HttpContext.User.FindFirst("userId")?.Value;
+            var userId = "test";
 
             var dbContext = context.HttpContext.RequestServices.GetService(typeof(AppDbContext)) as AppDbContext;
 
@@ -47,7 +47,6 @@ namespace AnimeCards.Filters.AuthorizationFilters
                 StatusCode = (int)HttpStatusCode.Forbidden,
                 ContentTypes = new Microsoft.AspNetCore.Mvc.Formatters.MediaTypeCollection() { "application/json" }
             };
-
         }
     }
 }
