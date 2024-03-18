@@ -96,6 +96,24 @@ namespace Common_Shared.Accessor
                                                                                                         Secure = true,
                                                                                                         Expires = expirytimeAccess
                                                                                                     });
+
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Refresh-Token", HttpUtility.UrlEncode(tokenModel.RefreshToken),
+                                                                                             new CookieOptions()
+                                                                                             {
+                                                                                                 HttpOnly = true,
+                                                                                                 SameSite = SameSiteMode.Strict,
+                                                                                                 Secure = true,
+                                                                                                 Expires = expirytimeRefresh
+                                                                                             });
+
+            _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Refresh-Token-ExpiryInSeconds", tokenModel.RefreshTokenExpiryInSeconds.ToString(),
+                                                                                                    new CookieOptions()
+                                                                                                    {
+                                                                                                        HttpOnly = true,
+                                                                                                        SameSite = SameSiteMode.Strict,
+                                                                                                        Secure = true,
+                                                                                                        Expires = expirytimeRefresh
+                                                                                                    });
             _httpContextAccessor.HttpContext.Response.Cookies.Append("X-Username", userName,
                                                                     new CookieOptions()
                                                                     {

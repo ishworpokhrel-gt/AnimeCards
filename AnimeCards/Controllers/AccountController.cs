@@ -4,6 +4,7 @@ using Common_Shared.Constants;
 using Common_Shared.ResponseWrapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Models.Account;
 using System;
 using System.Threading.Tasks;
@@ -27,6 +28,17 @@ namespace AnimeCards.Controllers
                 return Ok(SuccessResponseWrapper<object>.SuccessApi(result.Result));
             return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
         }
+
+        [HttpPost("LogOut")]
+        public IActionResult LogOut()
+        {
+            HttpContext.Response.Cookies.Delete("X-Access-Token");
+            HttpContext.Response.Cookies.Delete("X-Access-Token-ExpiryInSeconds");
+            HttpContext.Response.Cookies.Delete("X-Refresh-Token");
+            HttpContext.Response.Cookies.Delete("X-Refresh-Token-ExpiryInSeconds");
+            return Ok(SuccessResponseWrapper<object>.SuccessApi("Log out successfully."));
+        }
+
         [Authorize]
         [HttpPost("ChangePassword")]
         [Permission(PermissionConstants.Update)]
