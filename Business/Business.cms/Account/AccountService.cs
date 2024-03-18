@@ -1,5 +1,6 @@
 ﻿using Common_Shared.Accessor;
 using Common_Shared.CommonModel;
+using Common_Shared.Constants;
 using Common_Shared.ResponseResult;
 using Common_Shared.Token;
 using Data;
@@ -7,14 +8,12 @@ using Entity;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Models.Account;
-using System.Text.RegularExpressions;
 
 namespace Business.Business.cms.Account
 {
     public class AccountService : IAccountService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly AppDbContext _dbContext;
         private readonly TokenProvider _tokenProvider;
@@ -26,7 +25,6 @@ namespace Business.Business.cms.Account
                                            IUserAccessor userAccessor,
                                            SignInManager<ApplicationUser> signInManager)
         {
-            _roleManager = roleManager;
             _userManager = userManager;
             _dbContext = dbContext;
             _tokenProvider = tokenProvider;
@@ -96,7 +94,7 @@ namespace Business.Business.cms.Account
             {
                 return ResponseResult.Failed("Incorrect old password.");
             }
-            var validPassword = PasswordValidator(passwordModel.NewPassword);
+            var validPassword = PasswordValidationCheck.PasswordValidators(passwordModel.NewPassword);
 
             if (!validPassword)
             {
@@ -111,21 +109,6 @@ namespace Business.Business.cms.Account
             }
             return ResponseResult.Success("password changed successfully.");
         }
-
-        public static bool PasswordValidator(string password)
-        {
-            if (password == null)
-            {
-                return false;
-            }
-            var isValid = Regex.IsMatch(password, @"[^(a-zA-Z0-9)]");
-            if (isValid)
-            {
-                return true;
-            }
-            return false;
-        }
-
 
     }
 }

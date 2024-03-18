@@ -5,9 +5,7 @@ namespace Business.Business.cms.Account
 {
     public interface IAccountService
     {
-        //Task<ResponseResult> RegisterAsync(LogInRequestModel model);
         Task<ResponseResult> LogInAsync(LogInRequestModel model);
         Task<ResponseResult> ChangePasswordAsync(ChangePasswordRequestModel passwordModel);
-        //Task<ResponseResult> LogOutAsync();
     }
 }

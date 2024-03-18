@@ -1,8 +1,11 @@
-﻿using Business.Business.cms.Account;
+﻿using AnimeCards.Filters.AuthorizationFilters;
+using Business.Business.cms.Account;
+using Common_Shared.Constants;
 using Common_Shared.ResponseWrapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Account;
+using System;
 using System.Threading.Tasks;
 
 namespace AnimeCards.Controllers
@@ -26,6 +29,7 @@ namespace AnimeCards.Controllers
         }
         [Authorize]
         [HttpPost("ChangePassword")]
+        [Permission(PermissionConstants.Update)]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequestModel model)
         {
             var result = await _accountService.ChangePasswordAsync(model);

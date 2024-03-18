@@ -16,6 +16,7 @@ namespace AnimeCards.Controllers
         {
             _animeService = animeService;
         }
+       
         [HttpGet("GetAllAnimes")]
         [Permission(PermissionConstants.Read)]
         public async Task<IActionResult> GetAll()
@@ -43,7 +44,7 @@ namespace AnimeCards.Controllers
         }
 
         [HttpPut("UpdateAnime")]
-        //[Permission(PermissionConstants.Update)]
+        [Permission(PermissionConstants.Update)]
         public async Task<IActionResult> UpdateAnime(string Id, UpdateAnimeRequestModel model)
         {
             var responseData = await _animeService.UpdateAsync(Id, model);
@@ -56,7 +57,7 @@ namespace AnimeCards.Controllers
         }
 
         [HttpDelete("DeleteAnime")]
-        //[Permission(PermissionConstants.Delete)]
+        [Permission(PermissionConstants.Delete)]
         public async Task<IActionResult> DeleteAnime(string Id)
         {
             var responseData = await _animeService.DeleteAsync(Id);
