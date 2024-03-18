@@ -2,6 +2,7 @@
 using Common_Shared.CommonModel;
 using Common_Shared.Constants;
 using Common_Shared.ResponseResult;
+using Common_Shared.SystemList;
 using Common_Shared.Token;
 using Data;
 using Entity;
@@ -14,6 +15,7 @@ namespace Business.Business.cms.Account
     public class AccountService : IAccountService
     {
         private readonly UserManager<ApplicationUser> _userManager;
+        private readonly RoleManager<ApplicationRole> _roleManager;
         private readonly SignInManager<ApplicationUser> _signInManager;
         private readonly AppDbContext _dbContext;
         private readonly TokenProvider _tokenProvider;
@@ -113,5 +115,43 @@ namespace Business.Business.cms.Account
             return ResponseResult.Success("password changed successfully.");
         }
 
+        public async Task<ResponseResult> RegistrationAsync(RegistrationRequestModel Model)
+        {
+            var validUser = await _userManager.FindByNameAsync(Model.UserName);
+            var checkPassword = await _userManager.CheckPasswordAsync(validUser, Model.Password);
+
+            if (validUser != null && checkPassword)
+            {
+                return ResponseResult.Failed("User already exists.");
+            }
+
+            var validPassword = PasswordValidationCheck.PasswordValidators(Model.Password);
+            if (!validPassword)
+            {
+                return ResponseResult.Failed("Password must have alteast one uppercase,lowercase,number and one unique character.");
+            }
+
+            var user = new ApplicationUser
+            {
+                Id = Guid.NewGuid().ToString(),
+                UserName = Model.UserName,
+                FullName = Model.FullName,
+                PasswordHash = Model.Password,
+                Email = Model.Email,
+                PhoneNumber = Model.PhoneNumber
+            };
+
+            var createuser = await _userManager.CreateAsync(user, Model.Password);
+            if (!createuser.Succeeded)
+            {
+                var error = createuser.Errors.Select(a => a.Description).FirstOrDefault();
+                return ResponseResult.Failed(error);
+            }
+            await _userManager.AddToRoleAsync(user, SystemConstant.CustomerRole);
+
+            await _dbContext.SaveChangesAsync();
+            return ResponseResult.Success("Registration successful.");
+
+        }
     }
 }

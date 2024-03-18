@@ -4,9 +4,7 @@ using Common_Shared.Constants;
 using Common_Shared.ResponseWrapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using Models.Account;
-using System;
 using System.Threading.Tasks;
 
 namespace AnimeCards.Controllers
@@ -18,6 +16,15 @@ namespace AnimeCards.Controllers
         public AccountController(IAccountService accountService)
         {
             _accountService = accountService;
+        }
+
+        [HttpPost("Registration")]
+        public async Task<IActionResult> Registration(RegistrationRequestModel model)
+        {
+            var result = await _accountService.RegistrationAsync(model);
+            if (result.IsSuccess)
+                return Ok(SuccessResponseWrapper<object>.SuccessApi(result.Result));
+            return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
         }
 
         [HttpPost("LogIn")]

@@ -7,5 +7,6 @@ namespace Business.Business.cms.Account
     {
         Task<ResponseResult> LogInAsync(LogInRequestModel model);
         Task<ResponseResult> ChangePasswordAsync(ChangePasswordRequestModel passwordModel);
+        Task<ResponseResult> RegistrationAsync(RegistrationRequestModel Model);
     }
 }
