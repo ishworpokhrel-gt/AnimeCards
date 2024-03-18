@@ -19,7 +19,7 @@ namespace AnimeCards.Filters.AuthorizationFilters
         }
         public void OnAuthorization(AuthorizationFilterContext context)
         {
-            var userId = "test";
+            var userId = context.HttpContext.User.FindFirst("userId")?.Value;
 
             var dbContext = context.HttpContext.RequestServices.GetService(typeof(AppDbContext)) as AppDbContext;
 

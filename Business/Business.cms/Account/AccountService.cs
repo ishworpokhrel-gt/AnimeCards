@@ -66,12 +66,15 @@ namespace Business.Business.cms.Account
                 return ResponseResult.Failed("Incorrect username or password.");
             }
 
-            var tokenProvided = _tokenProvider.createadmincookies(user);
+            var tokenProvided = _tokenProvider.createadmintoken(user);
+            var tokenRefreshProvided = _tokenProvider.AdminRefreshToken(user);
 
             _userAccessor.SetAuthCookiesInClient(new TokenModel
             {
                 AccessToken = tokenProvided.Item1,
-                AccessTokenExpiryInSeconds = tokenProvided.Item2
+                AccessTokenExpiryInSeconds = tokenProvided.Item2,
+                RefreshToken = tokenRefreshProvided.Item2,
+                RefreshTokenExpiryInSeconds = tokenRefreshProvided.Item1
             }, user.UserName);
 
             return ResponseResult.Success("Login Successfully");

@@ -10,12 +10,10 @@ namespace Common_Shared.Accessor
     public class UserAccessor : IUserAccessor
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        private readonly IHostEnvironment _webHostEnvironment;
         public UserAccessor(IHttpContextAccessor httpContextAccessor
                             , IHostEnvironment webHostEnvironment)
         {
             _httpContextAccessor = httpContextAccessor;
-            _webHostEnvironment = webHostEnvironment;
         }
 
         public LoggingUser GetUserName()

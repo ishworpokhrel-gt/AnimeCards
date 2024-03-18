@@ -81,7 +81,8 @@ try
                 if (context.Request.Cookies.ContainsKey("X-Access-Token"))
                 {
                     context.Token = context.Request.Cookies["X-Access-Token"];
-                }
+                }    
+                
                 else if (context.Request.Cookies.ContainsKey("X-Refresh-Token"))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.Forbidden;

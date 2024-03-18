@@ -7,6 +7,8 @@ namespace Common_Shared.CommonModel
         [Required]
         public string AccessToken { get; set; }
         public int AccessTokenExpiryInSeconds { get; set; }
+        public string RefreshToken { get; set; }
+        public int RefreshTokenExpiryInSeconds { get; set; }
 
     }
 }

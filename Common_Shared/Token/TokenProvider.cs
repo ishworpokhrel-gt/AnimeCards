@@ -3,6 +3,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace Common_Shared.Token
@@ -19,7 +20,7 @@ namespace Common_Shared.Token
 
         }
 
-        public Tuple<string, int> createadmincookies(ApplicationUser user)
+        public Tuple<string, int> createadmintoken(ApplicationUser user)
         {
             var claims = new List<Claim>
             {
@@ -42,6 +43,20 @@ namespace Common_Shared.Token
 
             return new(tokenHandler.WriteToken(token), time * 60);
 
+        }
+
+        public Tuple<int,string> AdminRefreshToken(ApplicationUser user)
+        {
+            var randomByte = new byte[64];
+            var randomNumbers = RandomNumberGenerator.Create();
+            randomNumbers.GetBytes(randomByte);
+
+            var refToken = Convert.ToBase64String(randomByte);
+            _ = int.TryParse(_config["Jwt:JWTAdminRefreshExpiresInMinutes"], out var expireTIme);
+
+            int totalRefreshTime = expireTIme * 60;
+
+            return new(totalRefreshTime, refToken);
         }
 
     }
