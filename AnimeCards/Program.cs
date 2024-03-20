@@ -162,6 +162,7 @@ try
 
     app.UseMiddleware<ExceptionMiddleware>();
     app.UseRouting();
+    app.UseStaticFiles();
 
     app.UseAuthentication();
     app.UseAuthorization();

@@ -8,8 +8,12 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\Common_Shared\Common_Shared.csproj" />
+		<ProjectReference Include="..\Entity\Entity.csproj" />
 		<ProjectReference Include="..\Models\Models.csproj" />
 		<ProjectReference Include="..\Data\Data.csproj" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.2.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning" Version="5.1.0" />
+		<PackageReference Include="Microsoft.AspNetCore.Mvc.Versioning.ApiExplorer" Version="5.1.0" />
 	</ItemGroup>
 
 	<ItemGroup>

@@ -5,9 +5,10 @@ namespace Business.Anime
 {
     public interface IAnimeSerivice
     {
-        Task<ResponseResult> GetAllAsync();
-        Task<ResponseResult> GetAllByIdAsync(string Id);
-        Task<ResponseResult> UpdateAsync(string Id, UpdateAnimeRequestModel model);
-        Task<ResponseResult> DeleteAsync(string Id);
+        Task<ResponseResult> CreateAnimeAsync(CreateAnimeRequestModel model);
+        Task<ResponseResult> GetAllAnimeAsync();
+        Task<ResponseResult> GetAllAnimeByIdAsync(string Id);
+        Task<ResponseResult> UpdateAnimeAsync(string Id, UpdateAnimeRequestModel model);
+        Task<ResponseResult> DeleteAnimeAsync(string Id);
     }
 }

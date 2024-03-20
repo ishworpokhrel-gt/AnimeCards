@@ -25,9 +25,9 @@ namespace Data
             modelBuilder.Entity<ApplicationUser>(entity => { entity.ToTable(name: "Users"); });
             modelBuilder.Entity<ApplicationRole>(entity => { entity.ToTable(name: "Roles"); });
             modelBuilder.Entity<Anime>().HasData(
-                new Anime { Name = "Naruto", Language = "JPN", RatingLevel = 5 },
-                new Anime { Name = "One Punch Man", Language = "KOR", RatingLevel = 4 },
-                new Anime { Name = "Baruto", Language = "NPL", RatingLevel = 2 }
+                new Anime { Name = "Naruto", Language = "JPN", RatingLevel = 5 , ImageUrl = "" },
+                new Anime { Name = "One Punch Man", Language = "KOR", RatingLevel = 4, ImageUrl = "" },
+                new Anime { Name = "Baruto", Language = "NPL", RatingLevel = 2, ImageUrl = "" }
                 );
         }
     }

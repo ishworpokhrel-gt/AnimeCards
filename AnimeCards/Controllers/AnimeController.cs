@@ -2,7 +2,6 @@
 using Business.Anime;
 using Common_Shared.Constants;
 using Common_Shared.ResponseWrapper;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Anime;
 using System.Threading.Tasks;
@@ -16,12 +15,25 @@ namespace AnimeCards.Controllers
         {
             _animeService = animeService;
         }
-       
+        [HttpPost("CreateAnime")]
+        [Permission(PermissionConstants.Create)]
+        public async Task<IActionResult> CreateAnime(CreateAnimeRequestModel model)
+        {
+            var responseData = await _animeService.CreateAnimeAsync(model);
+            if (responseData.IsSuccess)
+            {
+                return Ok(SuccessResponseWrapper<object>.SuccessApi(responseData.Result));
+            }
+            return BadRequest(ErrorResponseWrapper.ErrorApi(responseData.Message));
+
+        }
+
+
         [HttpGet("GetAllAnimes")]
         [Permission(PermissionConstants.Read)]
         public async Task<IActionResult> GetAll()
         {
-            var responseData = await _animeService.GetAllAsync();
+            var responseData = await _animeService.GetAllAnimeAsync();
             if (responseData.IsSuccess)
             {
                 return Ok(SuccessResponseWrapper<object>.SuccessApi(responseData.Result));
@@ -34,7 +46,7 @@ namespace AnimeCards.Controllers
         [Permission(PermissionConstants.Read)]
         public async Task<IActionResult> GetAnimeById(string Id)
         {
-            var responseData = await _animeService.GetAllByIdAsync(Id);
+            var responseData = await _animeService.GetAllAnimeByIdAsync(Id);
             if (responseData.IsSuccess)
             {
                 return Ok(SuccessResponseWrapper<object>.SuccessApi(responseData.Result));
@@ -47,7 +59,7 @@ namespace AnimeCards.Controllers
         [Permission(PermissionConstants.Update)]
         public async Task<IActionResult> UpdateAnime(string Id, UpdateAnimeRequestModel model)
         {
-            var responseData = await _animeService.UpdateAsync(Id, model);
+            var responseData = await _animeService.UpdateAnimeAsync(Id, model);
             if (responseData.IsSuccess)
             {
                 return Ok(SuccessResponseWrapper<object>.SuccessApi(responseData.Result));
@@ -60,7 +72,7 @@ namespace AnimeCards.Controllers
         [Permission(PermissionConstants.Delete)]
         public async Task<IActionResult> DeleteAnime(string Id)
         {
-            var responseData = await _animeService.DeleteAsync(Id);
+            var responseData = await _animeService.DeleteAnimeAsync(Id);
             if (responseData.IsSuccess)
             {
                 return Ok(SuccessResponseWrapper<object>.SuccessApi(responseData.Result));

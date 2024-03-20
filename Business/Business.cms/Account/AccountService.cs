@@ -107,7 +107,7 @@ namespace Business.Business.cms.Account
             }
             var hashpassword = _userManager.PasswordHasher.HashPassword(user, passwordModel.NewPassword);
 
-            var changePassword = await _userManager.ChangePasswordAsync(user, passwordModel.OldPassword, passwordModel.NewPassword);
+            var changePassword = await _userManager.ChangePasswordAsync(user, passwordModel.OldPassword, hashpassword);
             if (!changePassword.Succeeded)
             {
                 return ResponseResult.Failed(changePassword.Errors.Select(a => a.Description).FirstOrDefault());

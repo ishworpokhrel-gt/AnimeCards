@@ -18,6 +18,7 @@ namespace AnimeCards.Controllers
             _accountService = accountService;
         }
 
+        [AllowAnonymous]
         [HttpPost("Registration")]
         public async Task<IActionResult> Registration(RegistrationRequestModel model)
         {
@@ -27,6 +28,7 @@ namespace AnimeCards.Controllers
             return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
         }
 
+        [AllowAnonymous]
         [HttpPost("LogIn")]
         public async Task<IActionResult> LogIn(LogInRequestModel model)
         {
@@ -46,9 +48,7 @@ namespace AnimeCards.Controllers
             return Ok(SuccessResponseWrapper<object>.SuccessApi("Log out successfully."));
         }
 
-        [Authorize]
         [HttpPost("ChangePassword")]
-        [Permission(PermissionConstants.Update)]
         public async Task<IActionResult> ChangePassword(ChangePasswordRequestModel model)
         {
             var result = await _accountService.ChangePasswordAsync(model);
@@ -56,5 +56,7 @@ namespace AnimeCards.Controllers
                 return Ok(SuccessResponseWrapper<object>.SuccessApi(result.Result));
             return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
         }
+
+
     }
 }
