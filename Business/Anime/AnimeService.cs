@@ -19,7 +19,13 @@ namespace Business.Anime
 
         public async Task<ResponseResult> CreateAnimeAsync(CreateAnimeRequestModel model)
         {
-
+            var existData = await _dbContext.Animes
+                                                .Where(a => !a.IsDeleted)
+                                                .ToListAsync();
+            if (existData.Any(a => a.Name.ToLower() == model.Name.ToLower()))
+            {
+                return ResponseResult.Failed("Name already exists. Try different one.");
+            }
             var addData = new Entity.Anime
             {
                 Name = model.Name,
@@ -38,7 +44,9 @@ namespace Business.Anime
 
         public async Task<ResponseResult> GetAllAnimeAsync()
         {
-            var storedData = await _dbContext.Animes.ToListAsync();
+            var storedData = await _dbContext.Animes
+                                                    .Where(a => !a.IsDeleted)
+                                                    .ToListAsync();
             if (storedData == null)
             {
                 return ResponseResult.Failed("Empty Record , Not found.");
@@ -59,7 +67,7 @@ namespace Business.Anime
         public async Task<ResponseResult> GetAllAnimeByIdAsync(string Id)
         {
             var data = await _dbContext.Animes
-                                             .Where(a => a.Id == Id)
+                                             .Where(a => a.Id == Id && !a.IsDeleted)
                                              .FirstOrDefaultAsync();
             if (data == null)
             {
@@ -80,12 +88,25 @@ namespace Business.Anime
         public async Task<ResponseResult> UpdateAnimeAsync(string Id, UpdateAnimeRequestModel model)
         {
             var data = await _dbContext.Animes
-                                            .Where(a => a.Id == Id)
+                                            .Where(a => a.Id == Id && !a.IsDeleted)
                                             .FirstOrDefaultAsync();
+            var existDataList = await _dbContext.Animes
+                                                .Where(a => !a.IsDeleted)
+                                                .ToListAsync();
             if (data == null)
             {
                 return ResponseResult.Failed("Empty Record , Not found.");
             }
+
+            if (model.Name != data.Name)
+            {
+                bool isDuplicate = existDataList.Exists(a => a.Name.ToLower() == model.Name.ToLower());
+                if (isDuplicate)
+                {
+                    return ResponseResult.Failed("Name already exists. Try different one.");
+                }
+            }
+
 
             data.ImageUrl = GetImagePath(model.Image);
             data.Name = model.Name ?? data.Name;
@@ -99,13 +120,17 @@ namespace Business.Anime
         public async Task<ResponseResult> DeleteAnimeAsync(string Id)
         {
             var data = await _dbContext.Animes
-                                           .Where(a => a.Id == Id)
+                                           .Where(a => a.Id == Id && !a.IsDeleted)
                                            .FirstOrDefaultAsync();
             if (data == null)
             {
                 return ResponseResult.Failed("Empty Record , Not found.");
             }
-            _dbContext.Animes.Remove(data);
+
+            data.IsDeleted = true;
+            var guid = Guid.NewGuid().ToString();
+            data.Name = $"--Deleted{guid}{data.Name}";
+            _dbContext.Animes.Update(data);
             await _dbContext.SaveChangesAsync();
 
             return ResponseResult.Success("Data Deleted Successfully.");
