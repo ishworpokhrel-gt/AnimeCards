@@ -32,6 +32,7 @@ namespace Business.Business.cms.Account
             _tokenProvider = tokenProvider;
             _userAccessor = userAccessor;
             _signInManager = signInManager;
+            _roleManager = roleManager;
         }
 
         public async Task<ResponseResult> LogInAsync(LogInRequestModel model)
@@ -151,6 +152,107 @@ namespace Business.Business.cms.Account
 
             await _dbContext.SaveChangesAsync();
             return ResponseResult.Success("Registration successful.");
+
+        }
+
+        public async Task<ResponseResult> GetProfileAsync()
+        {
+            var loggedInUser = _userAccessor.GetUserId();
+
+            var user = await (from users in _dbContext.Users
+                              join userroles in _dbContext.UserRoles
+                              on users.Id equals userroles.UserId
+                              join roles in _dbContext.Roles
+                              on userroles.RoleId equals roles.Id
+                              where users.Id == loggedInUser
+                              select new
+                              {
+                                  users,
+                                  Roles = roles.Name
+                              }).ToListAsync();
+            var concatenatedRoles = string.Join(", ", user.Select(x => x.Roles).Where(x => x != null));
+
+            var realUser = user.Select(a => a.users).FirstOrDefault();
+
+
+
+
+            if (realUser == null)
+            {
+                return ResponseResult.Failed("User not found.");
+            }
+            var response = new
+            {
+                realUser.Id,
+                realUser.UserName,
+                realUser.Email,
+                realUser.PhoneNumber,
+                Role = concatenatedRoles
+            };
+
+            return ResponseResult.Success(response);
+
+        }
+
+        public async Task<ResponseResult> UpdateProfileAsync(string Id, UpdateProfileRequestModel model)
+        {
+            using var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
+            {
+                var User = await _dbContext.Users
+                                                .Where(a => a.Id == Id && !a.IsDeleted)
+                                                .FirstOrDefaultAsync();
+                var userRole = await _userManager.GetRolesAsync(User);
+                var userList = await _dbContext.Users
+                                                .Where(a => !a.IsDeleted)
+                                                .ToListAsync();
+
+                if (User == null)
+                {
+                    return ResponseResult.Failed("User not found.");
+                }
+
+                var normalizedEmail = _userManager.NormalizeEmail(model.Email);
+                if (userList.Exists(x => x.Email == model.Email))
+                {
+                    return ResponseResult.Failed("Email already exists, try another one.");
+                }
+                if (userList.Exists(x => x.PhoneNumber == model.PhoneNumber))
+                {
+                    return ResponseResult.Failed("Number already exists, try another one.");
+                }
+                User.Email = normalizedEmail;
+                User.PhoneNumber = model.PhoneNumber;
+                User.UserName = model.UserName;
+
+                bool isRoleExists = _roleManager.RoleExistsAsync(model.Role).GetAwaiter().GetResult();
+
+                if (!isRoleExists)
+                {
+                    return ResponseResult.Failed("Role doesnot exists.");
+                }
+                var userInRole = await _dbContext.Roles
+                                            .Where(a => a.Name == model.Role)
+                                            .Select(a => a.Name)
+                                            .FirstOrDefaultAsync();
+                _dbContext.Users.Update(User);
+                
+                await _userManager.RemoveFromRolesAsync(User, userRole);
+
+                await _userManager.AddToRoleAsync(User, model.Role.ToString());
+                                                              
+                await _dbContext.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+
+                return ResponseResult.Success("Profile updated successfully.");
+            }
+            catch (Exception ex)
+            {
+                await transaction.RollbackAsync();
+                return ResponseResult.Failed($"{ex.Message}");
+            }
+
 
         }
     }

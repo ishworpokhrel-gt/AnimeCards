@@ -15,6 +15,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Business", "Business\Busine
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Common_Shared", "Common_Shared\Common_Shared.csproj", "{06E73185-5CAB-48B4-B2EB-FA8159AE8F7E}"
 EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GrpcService", "GrpcService\GrpcService.csproj", "{B30C9D74-6A76-412D-AB88-2B473E9F9581}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,6 +47,10 @@ Global
 		{06E73185-5CAB-48B4-B2EB-FA8159AE8F7E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{06E73185-5CAB-48B4-B2EB-FA8159AE8F7E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{06E73185-5CAB-48B4-B2EB-FA8159AE8F7E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B30C9D74-6A76-412D-AB88-2B473E9F9581}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B30C9D74-6A76-412D-AB88-2B473E9F9581}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B30C9D74-6A76-412D-AB88-2B473E9F9581}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B30C9D74-6A76-412D-AB88-2B473E9F9581}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

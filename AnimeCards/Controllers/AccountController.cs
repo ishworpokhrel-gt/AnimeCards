@@ -5,6 +5,7 @@ using Common_Shared.ResponseWrapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Account;
+using System.Globalization;
 using System.Threading.Tasks;
 
 namespace AnimeCards.Controllers
@@ -52,6 +53,24 @@ namespace AnimeCards.Controllers
         public async Task<IActionResult> ChangePassword(ChangePasswordRequestModel model)
         {
             var result = await _accountService.ChangePasswordAsync(model);
+            if (result.IsSuccess)
+                return Ok(SuccessResponseWrapper<object>.SuccessApi(result.Result));
+            return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
+        }
+
+        [HttpPost("GetProfile")]
+        public async Task<IActionResult> GetProfile()
+        {
+            var result = await _accountService.GetProfileAsync();
+            if (result.IsSuccess)
+                return Ok(SuccessResponseWrapper<object>.SuccessApi(result.Result));
+            return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
+        }
+
+        [HttpPost("UpdateProfile")]
+        public async Task<IActionResult> UpdateProfile(string Id , UpdateProfileRequestModel model)
+        {
+            var result = await _accountService.UpdateProfileAsync(Id,model);
             if (result.IsSuccess)
                 return Ok(SuccessResponseWrapper<object>.SuccessApi(result.Result));
             return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
