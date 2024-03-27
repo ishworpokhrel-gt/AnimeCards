@@ -4,6 +4,7 @@ using Business.Anime;
 using Business.Business.cms.Account;
 using Common_Shared.Accessor;
 using Common_Shared.ResponseWrapper;
+using Common_Shared.SieveExtensio;
 using Common_Shared.Token;
 using Data;
 using Data.Seed;
@@ -18,11 +19,11 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
-using Microsoft.OpenApi.Writers;
 using Newtonsoft.Json;
 using Serilog;
 using Serilog.Events;
 using Serilog.Formatting.Compact;
+using Sieve.Services;
 using System;
 using System.Linq;
 using System.Net;
@@ -50,8 +51,10 @@ try
                             .AddDefaultTokenProviders();
     builder.Services.AddScoped<IAnimeSerivice, AnimeService>();
     builder.Services.AddScoped<IAccountService, AccountService>();
+    builder.Services.AddScoped<ISieveProcessor, SieveProcessor>();
     builder.Services.AddScoped<TokenProvider>();
     builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+    builder.Services.AddScoped<ISieveService, SieveService>();
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]));
     builder.Services.AddAuthentication(i =>
     {
@@ -81,8 +84,8 @@ try
                 if (context.Request.Cookies.ContainsKey("X-Access-Token"))
                 {
                     context.Token = context.Request.Cookies["X-Access-Token"];
-                }    
-                
+                }
+
                 else if (context.Request.Cookies.ContainsKey("X-Refresh-Token"))
                 {
                     context.Response.StatusCode = (int)HttpStatusCode.Forbidden;

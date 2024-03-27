@@ -1,9 +1,11 @@
 ﻿using Common_Shared.ResponseResult;
+using Common_Shared.SieveExtensio;
 using Data;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Models.Anime;
+using Models.PaginationModel;
 
 namespace Business.Anime
 {
@@ -11,10 +13,14 @@ namespace Business.Anime
     {
         private readonly AppDbContext _dbContext;
         private readonly IWebHostEnvironment _webHostEnvironment;
-        public AnimeService(AppDbContext dbContext, IWebHostEnvironment webHostEnvironment)
+        private readonly ISieveService _sieveService;
+        public AnimeService(AppDbContext dbContext
+                             , IWebHostEnvironment webHostEnvironment
+                              , ISieveService sieveService)
         {
             _webHostEnvironment = webHostEnvironment;
             _dbContext = dbContext;
+            _sieveService = sieveService;
         }
 
         public async Task<ResponseResult> CreateAnimeAsync(CreateAnimeRequestModel model)
@@ -42,16 +48,20 @@ namespace Business.Anime
 
         }
 
-        public async Task<ResponseResult> GetAllAnimeAsync()
+        public async Task<ResponseResult> GetAllAnimeAsync(PaginationRequestModel model)
         {
-            var storedData = await _dbContext.Animes
-                                                    .Where(a => !a.IsDeleted)
-                                                    .ToListAsync();
+            var storedData = _dbContext.Animes
+                                            .Where(a => !a.IsDeleted)
+                                            .AsQueryable();
+
             if (storedData == null)
             {
                 return ResponseResult.Failed("Empty Record , Not found.");
             }
-            var data = storedData.Select(a => new GetAllAnimeResppnseModel
+
+            var (result, totalCount, totalPage) = await _sieveService.ApplyPagination(storedData, model);
+            
+            var data = result.Select(a => new GetAllAnimeResppnseModel
             {
                 Id = a.Id,
                 Name = a.Name,

@@ -4,6 +4,7 @@ using Common_Shared.Constants;
 using Common_Shared.ResponseWrapper;
 using Microsoft.AspNetCore.Mvc;
 using Models.Anime;
+using Models.PaginationModel;
 using System.Threading.Tasks;
 
 namespace AnimeCards.Controllers
@@ -29,11 +30,11 @@ namespace AnimeCards.Controllers
         }
 
 
-        [HttpGet("GetAllAnimes")]
+        [HttpPost("GetAllAnimes")]
         [Permission(PermissionConstants.Read)]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll(PaginationRequestModel model)
         {
-            var responseData = await _animeService.GetAllAnimeAsync();
+            var responseData = await _animeService.GetAllAnimeAsync(model);
             if (responseData.IsSuccess)
             {
                 return Ok(SuccessResponseWrapper<object>.SuccessApi(responseData.Result));
