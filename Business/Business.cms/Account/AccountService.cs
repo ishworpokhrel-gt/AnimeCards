@@ -125,12 +125,54 @@ namespace Business.Business.cms.Account
             {
                 return ResponseResult.Failed("User already exists.");
             }
+           
+            if (Model.PhoneNumber != null)
+            {
+                if (Model.PhoneNumber is string value)
+                {
+                    foreach (var obj in value)
+                    {
+                        if (!char.IsDigit(obj))
+                        {
+                            return ResponseResult.Failed("Phone number invalid.");
+                        }
+                    }
+
+                }
+                else
+                {
+                    return ResponseResult.Failed("Invalid phone number.");
+                }
+            }
 
             var validPassword = PasswordValidationCheck.PasswordValidators(Model.Password);
             if (!validPassword)
             {
                 return ResponseResult.Failed("Password must have alteast one uppercase,lowercase,number and one unique character.");
             }
+            var details = await _dbContext.Users
+                                        .Where(a => !a.IsDeleted)
+                                        .Select(a => new
+                                        {
+                                            Number = a.PhoneNumber,
+                                            totalEmail = a.Email
+                                        })
+                                        .ToListAsync();
+            if (details.Any(a => a.totalEmail == Model.Email))
+            {
+                return ResponseResult.Failed("Email already exists.");
+            }
+
+            if (details.Any(a => a.Number == Model.PhoneNumber))
+            {
+                return ResponseResult.Failed("Phone number alredy exists.");
+            }
+
+            if (await _dbContext.Users.AnyAsync(a => !a.IsDeleted && a.PhoneNumber == Model.PhoneNumber))
+            {
+                return ResponseResult.Failed("Phone number already exists.");
+            }
+
 
             var user = new ApplicationUser
             {
@@ -236,11 +278,11 @@ namespace Business.Business.cms.Account
                                             .Select(a => a.Name)
                                             .FirstOrDefaultAsync();
                 _dbContext.Users.Update(User);
-                
+
                 await _userManager.RemoveFromRolesAsync(User, userRole);
 
                 await _userManager.AddToRoleAsync(User, model.Role.ToString());
-                                                              
+
                 await _dbContext.SaveChangesAsync();
 
                 await transaction.CommitAsync();
