@@ -125,7 +125,7 @@ namespace Business.Business.cms.Account
             {
                 return ResponseResult.Failed("User already exists.");
             }
-           
+
             if (Model.PhoneNumber != null)
             {
                 if (Model.PhoneNumber is string value)
@@ -255,13 +255,21 @@ namespace Business.Business.cms.Account
                 }
 
                 var normalizedEmail = _userManager.NormalizeEmail(model.Email);
-                if (userList.Exists(x => x.Email == model.Email))
+                if (User.Email != normalizedEmail)
                 {
-                    return ResponseResult.Failed("Email already exists, try another one.");
+                    if (userList.Exists(x => x.Email == model.Email))
+                    {
+                        return ResponseResult.Failed("Email already exists, try another one.");
+                    }
+
                 }
-                if (userList.Exists(x => x.PhoneNumber == model.PhoneNumber))
+                if (User.PhoneNumber != model.PhoneNumber)
                 {
-                    return ResponseResult.Failed("Number already exists, try another one.");
+                    if (userList.Exists(x => x.PhoneNumber == model.PhoneNumber))
+                    {
+                        return ResponseResult.Failed("Number already exists, try another one.");
+                    }
+
                 }
                 User.Email = normalizedEmail;
                 User.PhoneNumber = model.PhoneNumber;
@@ -273,15 +281,16 @@ namespace Business.Business.cms.Account
                 {
                     return ResponseResult.Failed("Role doesnot exists.");
                 }
-                var userInRole = await _dbContext.Roles
-                                            .Where(a => a.Name == model.Role)
-                                            .Select(a => a.Name)
-                                            .FirstOrDefaultAsync();
                 _dbContext.Users.Update(User);
 
-                await _userManager.RemoveFromRolesAsync(User, userRole);
+                if (!userRole.Contains(model.Role))
+                {
+                    await _userManager.RemoveFromRolesAsync(User, userRole);
+                    await _userManager.AddToRoleAsync(User, model.Role.ToString());
 
-                await _userManager.AddToRoleAsync(User, model.Role.ToString());
+                }
+
+
 
                 await _dbContext.SaveChangesAsync();
 

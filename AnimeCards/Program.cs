@@ -55,6 +55,15 @@ try
     builder.Services.AddScoped<TokenProvider>();
     builder.Services.AddScoped<IUserAccessor, UserAccessor>();
     builder.Services.AddScoped<ISieveService, SieveService>();
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AnimeCorsPolicy", policy =>
+        {
+            policy.AllowAnyHeader()
+             .AllowAnyMethod().
+             WithOrigins("www.anime.com");
+        });
+    });
     var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]));
     builder.Services.AddAuthentication(i =>
     {
