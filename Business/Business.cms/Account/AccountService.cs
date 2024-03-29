@@ -241,64 +241,49 @@ namespace Business.Business.cms.Account
             using var transaction = await _dbContext.Database.BeginTransactionAsync();
             try
             {
-                var User = await _dbContext.Users
-                                                .Where(a => a.Id == Id && !a.IsDeleted)
-                                                .FirstOrDefaultAsync();
-                var userRole = await _userManager.GetRolesAsync(User);
-                var userList = await _dbContext.Users
-                                                .Where(a => !a.IsDeleted)
-                                                .ToListAsync();
-
-                if (User == null)
+                var user = await _dbContext.Users.FirstOrDefaultAsync(a => a.Id == Id && !a.IsDeleted);
+                if (user == null)
                 {
                     return ResponseResult.Failed("User not found.");
                 }
 
                 var normalizedEmail = _userManager.NormalizeEmail(model.Email);
-                if (User.Email != normalizedEmail)
+                if (user.Email != normalizedEmail)
                 {
-                    if (userList.Exists(x => x.Email == model.Email))
+                    var emailExists = await _dbContext.Users.AnyAsync(x => x.Email == model.Email && x.Id != user.Id && !x.IsDeleted);
+                    if (emailExists)
                     {
                         return ResponseResult.Failed("Email already exists, try another one.");
                     }
-
+                    user.Email = normalizedEmail;
                 }
-                if (User.PhoneNumber != model.PhoneNumber)
+
+                if (user.PhoneNumber != model.PhoneNumber)
                 {
-                    if (userList.Exists(x => x.PhoneNumber == model.PhoneNumber))
+                    var phoneNumberExists = await _dbContext.Users.AnyAsync(x => x.PhoneNumber == model.PhoneNumber && x.Id != user.Id && !x.IsDeleted);
+                    if (phoneNumberExists)
                     {
                         return ResponseResult.Failed("Number already exists, try another one.");
                     }
-
-                }
-                User.Email = normalizedEmail;
-                User.PhoneNumber = model.PhoneNumber;
-                User.UserName = model.UserName;
-                
-                foreach (var roleexist in model.Role.Split(","))
-                {
-                    bool isRoleExists = _roleManager.RoleExistsAsync(roleexist.ToString()).GetAwaiter().GetResult();
-                    if (!isRoleExists)
-                    {
-                        return ResponseResult.Failed("Role doesnot exists.");
-                    }
+                    user.PhoneNumber = model.PhoneNumber;
                 }
 
-                _dbContext.Users.Update(User);
+                user.UserName = model.UserName;
 
-                if (model.Role != null && model.Role.Count() > 0)
+                if (!string.IsNullOrWhiteSpace(model.Role))
                 {
-                    await _userManager.RemoveFromRolesAsync(User, userRole);
-                    foreach (var role in model.Role.Split(","))
+                    var roles = model.Role.Split(',');
+                    var rolesExist = await _roleManager.Roles.AnyAsync(r => roles.Contains(r.Name));
+                    if (!rolesExist)
                     {
-                        await _userManager.AddToRoleAsync(User, role.ToString());
-
+                        return ResponseResult.Failed("One or more roles do not exist.");
                     }
 
+                    await _userManager.RemoveFromRolesAsync(user, await _userManager.GetRolesAsync(user));
+                    await _userManager.AddToRolesAsync(user, roles);
                 }
 
                 await _dbContext.SaveChangesAsync();
-
                 await transaction.CommitAsync();
 
                 return ResponseResult.Success("Profile updated successfully.");
@@ -308,8 +293,7 @@ namespace Business.Business.cms.Account
                 await transaction.RollbackAsync();
                 return ResponseResult.Failed($"{ex.Message}");
             }
-
-
         }
+
     }
 }
