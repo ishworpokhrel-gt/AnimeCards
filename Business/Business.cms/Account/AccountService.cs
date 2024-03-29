@@ -274,23 +274,28 @@ namespace Business.Business.cms.Account
                 User.Email = normalizedEmail;
                 User.PhoneNumber = model.PhoneNumber;
                 User.UserName = model.UserName;
-
-                bool isRoleExists = _roleManager.RoleExistsAsync(model.Role).GetAwaiter().GetResult();
-
-                if (!isRoleExists)
+                
+                foreach (var roleexist in model.Role.Split(","))
                 {
-                    return ResponseResult.Failed("Role doesnot exists.");
+                    bool isRoleExists = _roleManager.RoleExistsAsync(roleexist.ToString()).GetAwaiter().GetResult();
+                    if (!isRoleExists)
+                    {
+                        return ResponseResult.Failed("Role doesnot exists.");
+                    }
                 }
+
                 _dbContext.Users.Update(User);
 
-                if (!userRole.Contains(model.Role))
+                if (model.Role != null && model.Role.Count() > 0)
                 {
                     await _userManager.RemoveFromRolesAsync(User, userRole);
-                    await _userManager.AddToRoleAsync(User, model.Role.ToString());
+                    foreach (var role in model.Role.Split(","))
+                    {
+                        await _userManager.AddToRoleAsync(User, role.ToString());
+
+                    }
 
                 }
-
-
 
                 await _dbContext.SaveChangesAsync();
 
