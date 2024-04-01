@@ -242,6 +242,7 @@ namespace Business.Business.cms.Account
             try
             {
                 var user = await _dbContext.Users.FirstOrDefaultAsync(a => a.Id == Id && !a.IsDeleted);
+                var totalUser = await _dbContext.Users.Where(a => !a.IsDeleted).ToListAsync();
                 if (user == null)
                 {
                     return ResponseResult.Failed("User not found.");
@@ -250,7 +251,7 @@ namespace Business.Business.cms.Account
                 var normalizedEmail = _userManager.NormalizeEmail(model.Email);
                 if (user.Email != normalizedEmail)
                 {
-                    var emailExists = await _dbContext.Users.AnyAsync(x => x.Email == model.Email && x.Id != user.Id && !x.IsDeleted);
+                    var emailExists = totalUser.Any(x => x.Email == model.Email);
                     if (emailExists)
                     {
                         return ResponseResult.Failed("Email already exists, try another one.");
@@ -260,7 +261,7 @@ namespace Business.Business.cms.Account
 
                 if (user.PhoneNumber != model.PhoneNumber)
                 {
-                    var phoneNumberExists = await _dbContext.Users.AnyAsync(x => x.PhoneNumber == model.PhoneNumber && x.Id != user.Id && !x.IsDeleted);
+                    var phoneNumberExists = totalUser.Any(x => x.PhoneNumber == model.PhoneNumber);
                     if (phoneNumberExists)
                     {
                         return ResponseResult.Failed("Number already exists, try another one.");

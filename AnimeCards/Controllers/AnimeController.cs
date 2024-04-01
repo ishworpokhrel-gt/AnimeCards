@@ -81,5 +81,17 @@ namespace AnimeCards.Controllers
             return BadRequest(ErrorResponseWrapper.ErrorApi(responseData.Message));
 
         }
+
+        [HttpGet("ExportExcel")]
+        public async Task<IActionResult> ExportAnimeExcel()
+        {
+            var responseData = await _animeService.ExportAnimeExcelAsync();
+            if (responseData.Item1)
+            {
+                return File(responseData.Item2, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",responseData.Item3);
+            }
+            return BadRequest(ErrorResponseWrapper.ErrorApi("Failed to get excel."));
+
+        }
     }
 }

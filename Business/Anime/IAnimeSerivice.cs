@@ -11,5 +11,7 @@ namespace Business.Anime
         Task<ResponseResult> GetAllAnimeByIdAsync(string Id);
         Task<ResponseResult> UpdateAnimeAsync(string Id, UpdateAnimeRequestModel model);
         Task<ResponseResult> DeleteAnimeAsync(string Id);
+        Task<Tuple<bool, byte[],string>> ExportAnimeExcelAsync();
+       
     }
 }

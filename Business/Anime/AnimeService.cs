@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Models.Anime;
 using Models.PaginationModel;
+using OfficeOpenXml;
+using OfficeOpenXml.Style;
 
 namespace Business.Anime
 {
@@ -60,7 +62,7 @@ namespace Business.Anime
             }
 
             var (result, totalCount, totalPage) = await _sieveService.ApplyPagination(storedData, model);
-            
+
             var data = result.Select(a => new GetAllAnimeResppnseModel
             {
                 Id = a.Id,
@@ -165,6 +167,36 @@ namespace Business.Anime
             else return string.Empty;
         }
 
+        public async Task<Tuple<bool, byte[], string>> ExportAnimeExcelAsync()
+        {
+            try
+            {
+                var items = await _dbContext.Animes
+                                            .Where(a => !a.IsDeleted)
+                                            .ToListAsync();
+                var fileName = "AnimeReport";
+                var excelOutput = GenerateExcel(items);
+                return Tuple.Create(true, excelOutput, fileName);
+            }
+            catch (Exception ex)
+            {
+                return Tuple.Create(false, Array.Empty<byte>(), string.Empty);
+            }
+        }
 
+        private static byte[] GenerateExcel(List<Entity.Anime> items)
+        {
+            ExcelPackage.LicenseContext = LicenseContext.Commercial;
+            using (var pck = new ExcelPackage())
+            {
+                var sheet = pck.Workbook.Worksheets.Add("AnimeSheet");
+                var range = sheet.Cells["A1"].LoadFromCollection(items, c => c.PrintHeaders = true);
+                range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
+                range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
+                range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
+                sheet.Cells.AutoFitColumns();
+                return pck.GetAsByteArray();
+            }
+        }
     }
 }
