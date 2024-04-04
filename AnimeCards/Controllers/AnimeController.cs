@@ -70,7 +70,7 @@ namespace AnimeCards.Controllers
         }
 
         [HttpDelete("DeleteAnime")]
-        [Permission(PermissionConstants.Delete)]
+        [Permission(PermissionConstants.Delete)]  
         public async Task<IActionResult> DeleteAnime(string Id)
         {
             var responseData = await _animeService.DeleteAnimeAsync(Id);
@@ -83,6 +83,7 @@ namespace AnimeCards.Controllers
         }
 
         [HttpGet("ExportExcel")]
+        [Permission(PermissionConstants.ExportExcel)]
         public async Task<IActionResult> ExportAnimeExcel()
         {
             var responseData = await _animeService.ExportAnimeExcelAsync();

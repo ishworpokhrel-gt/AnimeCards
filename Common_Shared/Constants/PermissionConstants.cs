@@ -6,6 +6,7 @@
         public const string Read = "2";
         public const string Update = "3";
         public const string Delete = "4";
+        public const string ExportExcel = "5";
 
         public static List<string> GetAllPermissions()
         {

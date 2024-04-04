@@ -186,11 +186,17 @@ namespace Business.Anime
 
         private static byte[] GenerateExcel(List<Entity.Anime> items)
         {
-            ExcelPackage.LicenseContext = LicenseContext.Commercial;
+            ExcelPackage.LicenseContext = LicenseContext.NonCommercial;
             using (var pck = new ExcelPackage())
             {
                 var sheet = pck.Workbook.Worksheets.Add("AnimeSheet");
                 var range = sheet.Cells["A1"].LoadFromCollection(items, c => c.PrintHeaders = true);
+               
+                var headerCells = sheet.Cells[sheet.Dimension.Start.Row, sheet.Dimension.Start.Column, 1, sheet.Dimension.End.Column];
+                headerCells.Style.Font.Bold = true;
+                headerCells.Style.Font.Size = 13;
+                headerCells.Style.HorizontalAlignment = ExcelHorizontalAlignment.Center;
+
                 range.Style.Border.Left.Style = ExcelBorderStyle.Thin;
                 range.Style.Border.Right.Style = ExcelBorderStyle.Thin;
                 range.Style.Border.Bottom.Style = ExcelBorderStyle.Thin;
