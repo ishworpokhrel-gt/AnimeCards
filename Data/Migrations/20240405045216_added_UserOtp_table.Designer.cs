@@ -4,6 +4,7 @@ using Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20240405045216_added_UserOtp_table")]
+    partial class added_UserOtp_table
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -62,7 +65,7 @@ namespace Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "9c0304d1-fad2-4195-b854-c6198a04af29",
+                            Id = "9fb97a6e-16af-41f5-a522-599e173cd4a6",
                             CreatedOn = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             ImageUrl = "",
                             IsDeleted = false,
@@ -73,7 +76,7 @@ namespace Data.Migrations
                         },
                         new
                         {
-                            Id = "ca0b1e40-95b1-4e3d-94b8-9f6ff22ce2da",
+                            Id = "d636fb2e-dad2-41ea-83c1-9719586763d9",
                             CreatedOn = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             ImageUrl = "",
                             IsDeleted = false,
@@ -84,7 +87,7 @@ namespace Data.Migrations
                         },
                         new
                         {
-                            Id = "20d9c562-2228-4959-8550-7b6621e693b0",
+                            Id = "71d8ea6e-c1c1-4c82-a611-e3960dd64166",
                             CreatedOn = new DateTimeOffset(new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), new TimeSpan(0, 0, 0, 0, 0)),
                             ImageUrl = "",
                             IsDeleted = false,
@@ -166,9 +169,6 @@ namespace Data.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
-                    b.Property<bool>("IsRegistrationComplete")
                         .HasColumnType("bit");
 
                     b.Property<string>("LastModifiedBy")

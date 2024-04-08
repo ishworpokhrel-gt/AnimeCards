@@ -3,6 +3,7 @@ using AnimeCards.MiddleWare;
 using Business.Anime;
 using Business.Business.cms.Account;
 using Common_Shared.Accessor;
+using Common_Shared.Otp;
 using Common_Shared.ResponseWrapper;
 using Common_Shared.SieveExtensio;
 using Common_Shared.Token;
@@ -54,6 +55,7 @@ try
     builder.Services.AddScoped<ISieveProcessor, SieveProcessor>();
     builder.Services.AddScoped<TokenProvider>();
     builder.Services.AddScoped<IUserAccessor, UserAccessor>();
+    builder.Services.AddScoped<OtpGenerator>();
     builder.Services.AddScoped<ISieveService, SieveService>();
     builder.Services.AddCors(options =>
     {

@@ -17,6 +17,7 @@ namespace Data.Seed
                     Email = "Admin@Admin.com",
                     Id = Guid.NewGuid().ToString(),
                     PhoneNumber = "1234567890",
+                    IsRegistrationComplete = true,
                 };
 
                 var userCustomer = new ApplicationUser
@@ -26,6 +27,7 @@ namespace Data.Seed
                     Email = "Customer@Customer.com",
                     Id = Guid.NewGuid().ToString(),
                     PhoneNumber = "1234567890",
+                    IsRegistrationComplete = true,
                 };
 
                 await userManager.CreateAsync(userCustomer, "Admin@123");

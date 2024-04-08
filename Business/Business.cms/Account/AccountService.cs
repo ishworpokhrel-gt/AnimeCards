@@ -1,6 +1,7 @@
 ﻿using Common_Shared.Accessor;
 using Common_Shared.CommonModel;
 using Common_Shared.Constants;
+using Common_Shared.Otp;
 using Common_Shared.ResponseResult;
 using Common_Shared.SystemList;
 using Common_Shared.Token;
@@ -20,12 +21,14 @@ namespace Business.Business.cms.Account
         private readonly AppDbContext _dbContext;
         private readonly TokenProvider _tokenProvider;
         private readonly IUserAccessor _userAccessor;
+        private readonly OtpGenerator _otpGenerator;
         public AccountService(RoleManager<ApplicationRole> roleManager,
                                           UserManager<ApplicationUser> userManager,
                                           AppDbContext dbContext,
                                           TokenProvider tokenProvider,
                                            IUserAccessor userAccessor,
-                                           SignInManager<ApplicationUser> signInManager)
+                                           SignInManager<ApplicationUser> signInManager,
+                                            OtpGenerator otpGenerator)
         {
             _userManager = userManager;
             _dbContext = dbContext;
@@ -33,6 +36,8 @@ namespace Business.Business.cms.Account
             _userAccessor = userAccessor;
             _signInManager = signInManager;
             _roleManager = roleManager;
+            _otpGenerator = otpGenerator;
+
         }
 
         public async Task<ResponseResult> LogInAsync(LogInRequestModel model)
@@ -118,82 +123,106 @@ namespace Business.Business.cms.Account
 
         public async Task<ResponseResult> RegistrationAsync(RegistrationRequestModel Model)
         {
-            var validUser = await _userManager.FindByNameAsync(Model.UserName);
-            var checkPassword = await _userManager.CheckPasswordAsync(validUser, Model.Password);
-
-            if (validUser != null && checkPassword)
+            var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
             {
-                return ResponseResult.Failed("User already exists.");
-            }
 
-            if (Model.PhoneNumber != null)
-            {
-                if (Model.PhoneNumber is string value)
+                var validUser = await _userManager.FindByNameAsync(Model.UserName);
+                var checkPassword = await _userManager.CheckPasswordAsync(validUser, Model.Password);
+
+                if (validUser != null && checkPassword)
                 {
-                    foreach (var obj in value)
+                    return ResponseResult.Failed("User already exists.");
+                }
+
+                if (Model.PhoneNumber != null)
+                {
+                    if (Model.PhoneNumber is string value)
                     {
-                        if (!char.IsDigit(obj))
+                        foreach (var obj in value)
                         {
-                            return ResponseResult.Failed("Phone number invalid.");
+                            if (!char.IsDigit(obj))
+                            {
+                                return ResponseResult.Failed("Phone number invalid.");
+                            }
                         }
+
                     }
-
+                    else
+                    {
+                        return ResponseResult.Failed("Invalid phone number.");
+                    }
                 }
-                else
+
+                var validPassword = PasswordValidationCheck.PasswordValidators(Model.Password);
+                if (!validPassword)
                 {
-                    return ResponseResult.Failed("Invalid phone number.");
+                    return ResponseResult.Failed("Password must have alteast one uppercase,lowercase,number and one unique character.");
                 }
+                var details = await _dbContext.Users
+                                            .Where(a => !a.IsDeleted)
+                                            .Select(a => new
+                                            {
+                                                Number = a.PhoneNumber,
+                                                totalEmail = a.Email
+                                            })
+                                            .ToListAsync();
+                if (details.Any(a => a.totalEmail == Model.Email))
+                {
+                    return ResponseResult.Failed("Email already exists.");
+                }
+
+                if (details.Any(a => a.Number == Model.PhoneNumber))
+                {
+                    return ResponseResult.Failed("Phone number alredy exists.");
+                }
+
+                if (await _dbContext.Users.AnyAsync(a => !a.IsDeleted && a.PhoneNumber == Model.PhoneNumber))
+                {
+                    return ResponseResult.Failed("Phone number already exists.");
+                }
+
+
+                var user = new ApplicationUser
+                {
+                    Id = Guid.NewGuid().ToString(),
+                    UserName = Model.UserName,
+                    FullName = Model.FullName,
+                    PasswordHash = Model.Password,
+                    Email = Model.Email,
+                    PhoneNumber = Model.PhoneNumber
+                };
+
+                var createuser = await _userManager.CreateAsync(user, Model.Password);
+                if (!createuser.Succeeded)
+                {
+                    var error = createuser.Errors.Select(a => a.Description).FirstOrDefault();
+                    return ResponseResult.Failed(error);
+                }
+                await _userManager.AddToRoleAsync(user, SystemConstant.CustomerRole);
+
+                var generatedOtp = _otpGenerator.GenerateOtp();
+                var hashOtp = _userManager.PasswordHasher.HashPassword(user, generatedOtp.Item1);
+
+                var otp = new UserOtp
+                {
+                    OtpCode = hashOtp,
+                    UserId = user.Id,
+                    OtpModule = SystemConstant.CustomerRole,
+                    Type = OtpType.SignUp
+                };
+
+                await _dbContext.UserOtp.AddAsync(otp);
+                await _dbContext.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return ResponseResult.Success("Registration successful.");
             }
-
-            var validPassword = PasswordValidationCheck.PasswordValidators(Model.Password);
-            if (!validPassword)
+            catch (Exception ex)
             {
-                return ResponseResult.Failed("Password must have alteast one uppercase,lowercase,number and one unique character.");
+                await transaction.RollbackAsync();
+                throw;
             }
-            var details = await _dbContext.Users
-                                        .Where(a => !a.IsDeleted)
-                                        .Select(a => new
-                                        {
-                                            Number = a.PhoneNumber,
-                                            totalEmail = a.Email
-                                        })
-                                        .ToListAsync();
-            if (details.Any(a => a.totalEmail == Model.Email))
-            {
-                return ResponseResult.Failed("Email already exists.");
-            }
-
-            if (details.Any(a => a.Number == Model.PhoneNumber))
-            {
-                return ResponseResult.Failed("Phone number alredy exists.");
-            }
-
-            if (await _dbContext.Users.AnyAsync(a => !a.IsDeleted && a.PhoneNumber == Model.PhoneNumber))
-            {
-                return ResponseResult.Failed("Phone number already exists.");
-            }
-
-
-            var user = new ApplicationUser
-            {
-                Id = Guid.NewGuid().ToString(),
-                UserName = Model.UserName,
-                FullName = Model.FullName,
-                PasswordHash = Model.Password,
-                Email = Model.Email,
-                PhoneNumber = Model.PhoneNumber
-            };
-
-            var createuser = await _userManager.CreateAsync(user, Model.Password);
-            if (!createuser.Succeeded)
-            {
-                var error = createuser.Errors.Select(a => a.Description).FirstOrDefault();
-                return ResponseResult.Failed(error);
-            }
-            await _userManager.AddToRoleAsync(user, SystemConstant.CustomerRole);
-
-            await _dbContext.SaveChangesAsync();
-            return ResponseResult.Success("Registration successful.");
 
         }
 
@@ -296,5 +325,42 @@ namespace Business.Business.cms.Account
             }
         }
 
+        public async Task<ResponseResult> ValidRegistrationAsync(string UserId, string Otp)
+        {
+            try
+            {
+                var registratingUser = await _dbContext.UserOtp
+                                                            .Include(x => x.User)
+                                                            .Where(a => a.UserId == UserId)
+                                                            .Select(a => new
+                                                            {
+                                                                a.OtpCode,
+                                                                a.User
+                                                            })
+                                                            .FirstOrDefaultAsync();
+                if (registratingUser == null)
+                {
+                    return ResponseResult.Failed("User not found");
+                }
+
+                var result = _userManager.PasswordHasher.VerifyHashedPassword(registratingUser.User, registratingUser.OtpCode, Otp);
+
+                if (result == PasswordVerificationResult.Failed)
+                {
+                    return ResponseResult.Failed("Invalid Otp");
+                }
+
+                registratingUser.User.IsRegistrationComplete = true;
+                _dbContext.Users.Update(registratingUser.User);
+                await _dbContext.SaveChangesAsync();
+
+                return ResponseResult.Success("Registration complete.");
+
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(ex.Message);
+            }
+        }
     }
 }

@@ -37,6 +37,7 @@ namespace Data
         public DbSet<ApplicationUser> Users { get; set; }
         public DbSet<RoleClaims> RoleClaims { get; set; }
         public DbSet<ApplicationRole> Roles { get; set; }
+        public DbSet<UserOtp> UserOtp { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

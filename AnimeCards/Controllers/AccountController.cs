@@ -5,6 +5,7 @@ using Common_Shared.ResponseWrapper;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Models.Account;
+using System.Drawing;
 using System.Globalization;
 using System.Threading.Tasks;
 
@@ -28,6 +29,18 @@ namespace AnimeCards.Controllers
                 return Ok(SuccessResponseWrapper<object>.SuccessApi(result.Result));
             return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
         }
+
+        [AllowAnonymous]
+        [HttpPost("ValidRegistration")]
+        public async Task<IActionResult> ValidRegistration(string UserId, string Otp)
+        {
+            var result = await _accountService.ValidRegistrationAsync(UserId,Otp);
+            if (result.IsSuccess)
+                return Ok(SuccessResponseWrapper<object>.SuccessApi(result.Result));
+            return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
+        }
+
+
 
         [AllowAnonymous]
         [HttpPost("LogIn")]
