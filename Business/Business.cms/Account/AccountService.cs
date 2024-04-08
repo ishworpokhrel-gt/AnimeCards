@@ -7,6 +7,7 @@ using Common_Shared.SystemList;
 using Common_Shared.Token;
 using Data;
 using Entity;
+using Entity.Account;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Models.Account;
@@ -212,7 +213,14 @@ namespace Business.Business.cms.Account
                     Type = OtpType.SignUp
                 };
 
+                var customer = new Customer
+                {
+                    UserId = user.Id,
+                    FullName = user.FullName
+                };
+
                 await _dbContext.UserOtp.AddAsync(otp);
+                await _dbContext.Customer.AddAsync(customer);
                 await _dbContext.SaveChangesAsync();
 
                 await transaction.CommitAsync();

@@ -70,7 +70,7 @@ namespace Business.Anime
                 RatingLevel = a.RatingLevel,
                 Language = a.Language,
                 ImageUrl = a.ImageUrl
-            });
+            }).ToList();
 
             return ResponseResult.Success(data);
         }
@@ -191,7 +191,7 @@ namespace Business.Anime
             {
                 var sheet = pck.Workbook.Worksheets.Add("AnimeSheet");
                 var range = sheet.Cells["A1"].LoadFromCollection(items, c => c.PrintHeaders = true);
-               
+
                 var headerCells = sheet.Cells[sheet.Dimension.Start.Row, sheet.Dimension.Start.Column, 1, sheet.Dimension.End.Column];
                 headerCells.Style.Font.Bold = true;
                 headerCells.Style.Font.Size = 13;

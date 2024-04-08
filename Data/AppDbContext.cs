@@ -1,6 +1,7 @@
 ﻿using Common_Shared.Accessor;
 using Data.Extension;
 using Entity;
+using Entity.Account;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 
@@ -38,6 +39,8 @@ namespace Data
         public DbSet<RoleClaims> RoleClaims { get; set; }
         public DbSet<ApplicationRole> Roles { get; set; }
         public DbSet<UserOtp> UserOtp { get; set; }
+        public DbSet<Customer> Customer { get; set; }
+        public DbSet<Admin> Admin { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

@@ -1,5 +1,6 @@
 ﻿using Common_Shared.SystemList;
 using Entity;
+using Entity.Account;
 using Microsoft.AspNetCore.Identity;
 
 namespace Data.Seed
@@ -10,7 +11,7 @@ namespace Data.Seed
         {
             if (!context.Users.Any())
             {
-                var user = new ApplicationUser
+                var userAdmin = new ApplicationUser
                 {
                     UserName = "Admin",
                     FullName = "Admin",
@@ -30,13 +31,25 @@ namespace Data.Seed
                     IsRegistrationComplete = true,
                 };
 
+                var customer = new Customer
+                {
+                    UserId = userCustomer.Id,
+                    FullName = userCustomer.FullName
+                };
+                var admin = new Admin
+                {
+                    UserId = userAdmin.Id,
+                    FullName = userAdmin.FullName
+                };
+
                 await userManager.CreateAsync(userCustomer, "Admin@123");
                 await userManager.AddToRoleAsync(userCustomer, SystemConstant.CustomerRole);
-                await userManager.CreateAsync(user, "Admin@123");
-                await userManager.AddToRoleAsync(user, SystemConstant.AdminRole);
+                await userManager.CreateAsync(userAdmin, "Admin@123");
+                await userManager.AddToRoleAsync(userAdmin, SystemConstant.AdminRole);
 
-                await context.Users.AddAsync(userCustomer);
-                await context.Users.AddAsync(user);
+          
+                await context.Customer.AddAsync(customer);
+                await context.Admin.AddAsync(admin);
                 await context.SaveChangesAsync();
 
             }
