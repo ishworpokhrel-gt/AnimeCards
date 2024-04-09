@@ -9,7 +9,7 @@ using Models.PaginationModel;
 using OfficeOpenXml;
 using OfficeOpenXml.Style;
 
-namespace Business.Anime
+namespace Business.Business.cms.Anime
 {
     public class AnimeService : IAnimeSerivice
     {
@@ -72,7 +72,15 @@ namespace Business.Anime
                 ImageUrl = a.ImageUrl
             }).ToList();
 
-            return ResponseResult.Success(data);
+            var pagination = new Pagination
+            {
+                Total = totalCount,
+                TotalPage = totalPage,
+                Current = model.PageNumber,
+                PageSize = model.PageSize
+            };
+
+            return ResponseResult.Success(data, pagination);
         }
 
 

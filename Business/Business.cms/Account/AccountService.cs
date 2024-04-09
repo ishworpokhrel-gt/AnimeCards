@@ -346,7 +346,7 @@ namespace Business.Business.cms.Account
                                                                 a.User
                                                             })
                                                             .FirstOrDefaultAsync();
-                if (registratingUser == null)
+                if (registratingUser.User == null)
                 {
                     return ResponseResult.Failed("User not found");
                 }

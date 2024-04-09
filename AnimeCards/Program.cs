@@ -1,7 +1,8 @@
 using AnimeCards.Extension;
 using AnimeCards.MiddleWare;
-using Business.Anime;
 using Business.Business.cms.Account;
+using Business.Business.cms.AdminCustomer;
+using Business.Business.cms.Anime;
 using Common_Shared.Accessor;
 using Common_Shared.Otp;
 using Common_Shared.ResponseWrapper;
@@ -52,6 +53,7 @@ try
                             .AddDefaultTokenProviders();
     builder.Services.AddScoped<IAnimeSerivice, AnimeService>();
     builder.Services.AddScoped<IAccountService, AccountService>();
+    builder.Services.AddScoped<IAdminCustomerService, AdminCustomerService>();
     builder.Services.AddScoped<ISieveProcessor, SieveProcessor>();
     builder.Services.AddScoped<TokenProvider>();
     builder.Services.AddScoped<IUserAccessor, UserAccessor>();

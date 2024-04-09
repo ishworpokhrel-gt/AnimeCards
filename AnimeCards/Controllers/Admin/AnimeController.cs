@@ -1,5 +1,5 @@
 ﻿using AnimeCards.Filters.AuthorizationFilters;
-using Business.Anime;
+using Business.Business.cms.Anime;
 using Common_Shared.Constants;
 using Common_Shared.ResponseWrapper;
 using Microsoft.AspNetCore.Mvc;
@@ -7,7 +7,7 @@ using Models.Anime;
 using Models.PaginationModel;
 using System.Threading.Tasks;
 
-namespace AnimeCards.Controllers
+namespace AnimeCards.Controllers.Admin
 {
     public class AnimeController : BaseApiController
     {
@@ -37,7 +37,7 @@ namespace AnimeCards.Controllers
             var responseData = await _animeService.GetAllAnimeAsync(model);
             if (responseData.IsSuccess)
             {
-                return Ok(SuccessResponseWrapper<object>.SuccessApi(responseData.Result));
+                return Ok(SuccessPaginateResponseWrapper<object, object>.WrapSuccess(responseData.Result, responseData.Pagination));
             }
             return BadRequest(ErrorResponseWrapper.ErrorApi(responseData.Message));
 
@@ -70,7 +70,7 @@ namespace AnimeCards.Controllers
         }
 
         [HttpDelete("DeleteAnime")]
-        [Permission(PermissionConstants.Delete)]  
+        [Permission(PermissionConstants.Delete)]
         public async Task<IActionResult> DeleteAnime(string Id)
         {
             var responseData = await _animeService.DeleteAnimeAsync(Id);
@@ -89,7 +89,7 @@ namespace AnimeCards.Controllers
             var responseData = await _animeService.ExportAnimeExcelAsync();
             if (responseData.Item1)
             {
-                return File(responseData.Item2, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",responseData.Item3);
+                return File(responseData.Item2, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", responseData.Item3);
             }
             return BadRequest(ErrorResponseWrapper.ErrorApi("Failed to get excel."));
 

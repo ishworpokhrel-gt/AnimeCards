@@ -9,7 +9,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Threading.Tasks;
 
-namespace AnimeCards.Controllers
+namespace AnimeCards.Controllers.Admin
 {
 
     public class AccountController : BaseApiController
@@ -34,7 +34,7 @@ namespace AnimeCards.Controllers
         [HttpPost("ValidRegistration")]
         public async Task<IActionResult> ValidRegistration(string UserId, string Otp)
         {
-            var result = await _accountService.ValidRegistrationAsync(UserId,Otp);
+            var result = await _accountService.ValidRegistrationAsync(UserId, Otp);
             if (result.IsSuccess)
                 return Ok(SuccessResponseWrapper<object>.SuccessApi(result.Result));
             return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
@@ -81,9 +81,9 @@ namespace AnimeCards.Controllers
         }
 
         [HttpPost("UpdateProfile")]
-        public async Task<IActionResult> UpdateProfile(string Id , UpdateProfileRequestModel model)
+        public async Task<IActionResult> UpdateProfile(string Id, UpdateProfileRequestModel model)
         {
-            var result = await _accountService.UpdateProfileAsync(Id,model);
+            var result = await _accountService.UpdateProfileAsync(Id, model);
             if (result.IsSuccess)
                 return Ok(SuccessResponseWrapper<object>.SuccessApi(result.Result));
             return BadRequest(ErrorResponseWrapper.ErrorApi(result.Message));
