@@ -112,6 +112,7 @@ namespace Business.Business.cms.Account
             }
             var previousPassword = await _dbContext.PreviousPassword
                                                                     .Where(a => a.UserId == personLoggedIn && !a.IsDeleted)
+                                                                    .OrderBy(a => a.CreatedOn)
                                                                     .ToListAsync();
 
             var validPassword = PasswordValidationCheck.PasswordValidators(passwordModel.NewPassword);
@@ -124,27 +125,53 @@ namespace Business.Business.cms.Account
                 }
             }
 
+            int totalPreviousPassword = 5;
+
             if (!validPassword)
             {
                 return ResponseResult.Failed("Please provide strong password with letters and special characters.");
             }
-            var hashpassword = _userManager.PasswordHasher.HashPassword(user, passwordModel.NewPassword);
 
-            var changePassword = await _userManager.ChangePasswordAsync(user, passwordModel.OldPassword, passwordModel.NewPassword);
-            if (!changePassword.Succeeded)
+            var transaction = await _dbContext.Database.BeginTransactionAsync();
+            try
             {
-                return ResponseResult.Failed(changePassword.Errors.Select(a => a.Description).FirstOrDefault());
+
+                if (totalPreviousPassword > 0 && previousPassword.Count >= totalPreviousPassword)
+                {
+                    var removableData = previousPassword.Count - (totalPreviousPassword - 1);
+                    if (removableData > 0)
+                    {
+                        var dataToRemove = previousPassword.Take(removableData);
+
+                        _dbContext.PreviousPassword.RemoveRange(dataToRemove);
+                    }
+                }
+
+                var hashpassword = _userManager.PasswordHasher.HashPassword(user, passwordModel.NewPassword);
+
+                var changePassword = await _userManager.ChangePasswordAsync(user, passwordModel.OldPassword, passwordModel.NewPassword);
+                if (!changePassword.Succeeded)
+                {
+                    return ResponseResult.Failed(changePassword.Errors.Select(a => a.Description).FirstOrDefault());
+                }
+
+                var previousPasswordStore = new PreviousPassword
+                {
+                    UserId = user.Id,
+                    HashPassword = hashpassword
+                };
+
+                await _dbContext.PreviousPassword.AddAsync(previousPasswordStore);
+                await _dbContext.SaveChangesAsync();
+
+                await transaction.CommitAsync();
+                return ResponseResult.Success("password changed successfully.");
             }
-
-            var previousPasswordStore = new PreviousPassword
+            catch
             {
-                UserId = user.Id,
-                HashPassword = hashpassword
-            };
-
-            await _dbContext.PreviousPassword.AddAsync(previousPasswordStore);
-            await _dbContext.SaveChangesAsync();
-            return ResponseResult.Success("password changed successfully.");
+                await transaction.RollbackAsync();
+                throw;
+            }
         }
 
         public async Task<ResponseResult> RegistrationAsync(RegistrationRequestModel Model)
