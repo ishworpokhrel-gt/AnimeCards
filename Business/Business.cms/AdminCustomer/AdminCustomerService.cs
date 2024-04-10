@@ -70,8 +70,6 @@ namespace Business.Business.cms.AdminCustomer
 
                 return ResponseResult.Success("Customer password change successfully.");
 
-
-
             }
             catch (Exception ex)
             {
@@ -144,30 +142,9 @@ namespace Business.Business.cms.AdminCustomer
                             return ResponseResult.Failed("Email already exists, Try another email.");
                         }
                     }
-                    if (model.PhoneNumber != customerInfo.User.PhoneNumber)
+                    if (!model.PhoneNumber.All(char.IsDigit))
                     {
-                        bool isPhoneNumberExist = totalUser.Any(a => a.PhoneNumber == model.PhoneNumber);
-                        if (isPhoneNumberExist)
-                        {
-                            return ResponseResult.Failed("Email already exists, Try another email.");
-                        }
-
-                        if (model.PhoneNumber is string number)
-                        {
-                            foreach (var num in number)
-                            {
-                                if (!char.IsDigit(num))
-                                {
-                                    return ResponseResult.Failed("Incorrect PhoneNumber format.");
-                                }
-                            }
-
-                        }
-                        else
-                        {
-                            return ResponseResult.Failed("Incorrect phoneNumber.");
-                        }
-
+                        return ResponseResult.Failed("Incorrect phone number format.");
                     }
 
                 }

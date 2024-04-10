@@ -41,6 +41,7 @@ namespace Data
         public DbSet<UserOtp> UserOtp { get; set; }
         public DbSet<Customer> Customer { get; set; }
         public DbSet<Admin> Admin { get; set; }
+        public DbSet<PreviousPassword> PreviousPassword { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

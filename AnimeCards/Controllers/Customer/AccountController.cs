@@ -9,7 +9,7 @@ using System.Drawing;
 using System.Globalization;
 using System.Threading.Tasks;
 
-namespace AnimeCards.Controllers.Admin
+namespace AnimeCards.Controllers.Customer
 {
 
     public class AccountController : BaseApiController

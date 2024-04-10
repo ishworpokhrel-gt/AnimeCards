@@ -106,7 +106,23 @@ namespace Business.Business.cms.Account
             {
                 return ResponseResult.Failed("Incorrect old password.");
             }
+            if (passwordModel.NewPassword == passwordModel.OldPassword)
+            {
+                return ResponseResult.Failed("Old password and new password is same.");
+            }
+            var previousPassword = await _dbContext.PreviousPassword
+                                                                    .Where(a => a.UserId == personLoggedIn && !a.IsDeleted)
+                                                                    .ToListAsync();
+
             var validPassword = PasswordValidationCheck.PasswordValidators(passwordModel.NewPassword);
+
+            foreach (var password in previousPassword)
+            {
+                if (_userManager.PasswordHasher.VerifyHashedPassword(user, password.HashPassword, passwordModel.NewPassword) == PasswordVerificationResult.Success)
+                {
+                    return ResponseResult.Failed("Old Password, choose new one.");
+                }
+            }
 
             if (!validPassword)
             {
@@ -114,11 +130,20 @@ namespace Business.Business.cms.Account
             }
             var hashpassword = _userManager.PasswordHasher.HashPassword(user, passwordModel.NewPassword);
 
-            var changePassword = await _userManager.ChangePasswordAsync(user, passwordModel.OldPassword, hashpassword);
+            var changePassword = await _userManager.ChangePasswordAsync(user, passwordModel.OldPassword, passwordModel.NewPassword);
             if (!changePassword.Succeeded)
             {
                 return ResponseResult.Failed(changePassword.Errors.Select(a => a.Description).FirstOrDefault());
             }
+
+            var previousPasswordStore = new PreviousPassword
+            {
+                UserId = user.Id,
+                HashPassword = hashpassword
+            };
+
+            await _dbContext.PreviousPassword.AddAsync(previousPasswordStore);
+            await _dbContext.SaveChangesAsync();
             return ResponseResult.Success("password changed successfully.");
         }
 
@@ -201,6 +226,13 @@ namespace Business.Business.cms.Account
                     return ResponseResult.Failed(error);
                 }
                 await _userManager.AddToRoleAsync(user, SystemConstant.CustomerRole);
+                var hashPassword = _userManager.PasswordHasher.HashPassword(user, Model.Password);
+
+                var previousPassword = new PreviousPassword
+                {
+                    UserId = user.Id,
+                    HashPassword = hashPassword
+                };
 
                 var generatedOtp = _otpGenerator.GenerateOtp();
                 var hashOtp = _userManager.PasswordHasher.HashPassword(user, generatedOtp.Item1);
@@ -220,6 +252,7 @@ namespace Business.Business.cms.Account
                 };
 
                 await _dbContext.UserOtp.AddAsync(otp);
+                await _dbContext.PreviousPassword.AddAsync(previousPassword);
                 await _dbContext.Customer.AddAsync(customer);
                 await _dbContext.SaveChangesAsync();
 
@@ -229,7 +262,7 @@ namespace Business.Business.cms.Account
             catch (Exception ex)
             {
                 await transaction.RollbackAsync();
-                throw;
+                throw new Exception("{@Message}", ex);
             }
 
         }
