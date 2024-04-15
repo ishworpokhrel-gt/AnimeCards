@@ -190,20 +190,9 @@ namespace Business.Business.cms.Account
 
                 if (Model.PhoneNumber != null)
                 {
-                    if (Model.PhoneNumber is string value)
+                    if (!Model.PhoneNumber.All(char.IsDigit))
                     {
-                        foreach (var obj in value)
-                        {
-                            if (!char.IsDigit(obj))
-                            {
-                                return ResponseResult.Failed("Phone number invalid.");
-                            }
-                        }
-
-                    }
-                    else
-                    {
-                        return ResponseResult.Failed("Invalid phone number.");
+                        return ResponseResult.Failed("Phone number invalid.");
                     }
                 }
 
@@ -229,12 +218,6 @@ namespace Business.Business.cms.Account
                 {
                     return ResponseResult.Failed("Phone number alredy exists.");
                 }
-
-                if (await _dbContext.Users.AnyAsync(a => !a.IsDeleted && a.PhoneNumber == Model.PhoneNumber))
-                {
-                    return ResponseResult.Failed("Phone number already exists.");
-                }
-
 
                 var user = new ApplicationUser
                 {
@@ -313,9 +296,6 @@ namespace Business.Business.cms.Account
 
             var realUser = user.Select(a => a.users).FirstOrDefault();
 
-
-
-
             if (realUser == null)
             {
                 return ResponseResult.Failed("User not found.");
@@ -346,7 +326,7 @@ namespace Business.Business.cms.Account
                 }
 
                 var normalizedEmail = _userManager.NormalizeEmail(model.Email);
-                if (user.Email != normalizedEmail)
+                if (user.NormalizedEmail != normalizedEmail)
                 {
                     var emailExists = totalUser.Any(x => x.Email == model.Email);
                     if (emailExists)
@@ -362,6 +342,10 @@ namespace Business.Business.cms.Account
                     if (phoneNumberExists)
                     {
                         return ResponseResult.Failed("Number already exists, try another one.");
+                    }
+                    if (!model.PhoneNumber.All(char.IsDigit))
+                    {
+                        return ResponseResult.Failed("Invalid Number.");
                     }
                     user.PhoneNumber = model.PhoneNumber;
                 }
@@ -419,7 +403,7 @@ namespace Business.Business.cms.Account
                 }
 
                 registratingUser.User.IsRegistrationComplete = true;
-                _dbContext.Users.Update(registratingUser.User);
+                await _userManager.UpdateAsync(registratingUser.User);
                 await _dbContext.SaveChangesAsync();
 
                 return ResponseResult.Success("Registration complete.");
